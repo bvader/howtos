@@ -61,8 +61,8 @@ GET /abc-product/_search
         "product_name._2gram",
         "product_name._3gram",
         "category_search",
-        "category_search",
-        "category_search"
+        "category_search_2gram",
+        "category_search_3gram"
       ]
     }
   },
@@ -74,6 +74,7 @@ GET /abc-product/_search
     }
   }
 }
+
 
 #
 # Search as you type with post filter
