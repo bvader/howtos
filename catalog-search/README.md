@@ -33,7 +33,7 @@ PUT /abc-product
 }
 ```
 
-Edit the abcycling-logstash.conf to point at your elasticsearch and run logstash
+Edit the [abcycling-logstash.conf](./abcycling-logstash.conf) to point at your elasticsearch and run logstash
 
 ```bash
 sudo /home/install/7.5.1/logstash-7.5.1/bin/logstash -r -f ./abcycling-logstash.conf
