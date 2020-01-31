@@ -221,7 +221,7 @@ server.ssl.key: /etc/kibana/certs/kibana.key
 elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/certs/selfca.pem" ]
 
 # To disregard the validity of SSL certificates, change this setting's value to 'none'.
-elasticsearch.ssl.verificationMode: none
+#elasticsearch.ssl.verificationMode: none
 ```
 
 Start, stop and status commands
