@@ -8,7 +8,7 @@ For Further Details Please Refer to the Official Documentation:
 [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
 
 ###What we are doing?
-This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled. We will then be able to bind the Elasticsearch and Kibana to the network so it can be reached from another system.  **Do NOT bind your elasticsearch to the network unless you secure your cluster and Kibana FIRST!**
+This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled. We will then be able to bind the Elasticsearch and Kibana to the network so it can be reached from another system.  **Do NOT bind your Elasticsearch node or cluster to the network unless you secure your cluster and Kibana FIRST!**
 
 **Notes:** 
 * This example is Ubuntu 18.04
@@ -95,9 +95,11 @@ network.host: ["_ens4_", "_local_"]
 # Add the rest of these settings at the bottom of the file
 discovery.type: single-node
 
-# Enable security and auditing
+# Enable security
 xpack.security.enabled: true
-xpack.security.audit.enabled: true
+
+# Enable auditing if you want, uncomment
+# xpack.security.audit.enabled: true
 
 # SSL Settings
 xpack.security.http.ssl.enabled: true
@@ -247,4 +249,21 @@ Note if you need to debug you can start kibana from the command line as a **non 
 ```bash
 /usr/share/kibana/bin/kibana -c /etc/kibana/kibana.yml
 ```
+
+## Sending data to Elasticsearch with Logstash and Beats
+
+To connect Logstash to an Elasticsearch cluster that is secured with a self signed certificate you will need to reference the Self CA that you created earlier. This will allow vaildation of the CA and a secure connection. 
+
+```
+output {
+  elasticsearch {
+    hosts => ["https://localhost:9200"]
+    user => "elastic"
+    password => "password"
+    cacert => "/etc/pki/root/selfca.pem"
+  }
+ stdout {codec => rubydebug}
+}
+```
+
 
