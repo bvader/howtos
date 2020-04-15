@@ -1,0 +1,191 @@
+{
+  $schema: https://vega.github.io/schema/vega/v4.3.0.json
+  padding: 2.5
+  signals: [
+    {
+      name: layout
+      value: squarify
+      bind: {
+        input: select
+        options: ["squarify", "binary", "slicedice"]
+      }
+    }
+    {
+      name: aspectRatio
+      value: 1.6
+      bind: {input: "range", min: 1, max: 5, step: 0.1}
+    }
+  ]
+  data: [
+    {
+      name: tree
+      format: {property: "aggregations.org.buckets"}
+      transform: [
+        {
+          type: flatten
+          fields: ["space.buckets"]
+          as: ["space_obj"]
+        }
+        {
+          type: flatten
+          fields: ["space_obj.app.buckets"]
+          as: ["app_obj"]
+        }
+        {
+          type: project
+          fields: ["key", "space_obj.key", "app_obj.key", "app_obj.doc_count"]
+          as: ["org", "space", "app", "count"]
+        }
+        {
+          type: nest
+          keys: ["org", "space", "app"]
+          generate: true
+        }
+        {
+          type: treemap 
+          field: count
+          sort: {field: "value", order: "descending"}
+          round: true
+          method: {signal: "layout"}
+          ratio: {signal: "aspectRatio"}
+          size: [
+            {signal: "width"}
+            {signal: "height"}
+          ]
+        }
+      ]
+      url: {
+        %context%: true
+        %timefield%: @timestamp
+        index:pcf-logs-*
+        body: {
+          aggs: {
+            org: {
+              terms: {
+                field: cloudfoundry.org.name.keyword
+                order: {_count: "desc"}
+                size: 10
+              }
+              aggs: {
+                space: {
+                  terms: {
+                    field: cloudfoundry.space.name.keyword
+                    order: {_count: "desc"}
+                    size: 10
+                  }
+                  aggs: {
+                    app: {
+                      terms: {
+                        field: cloudfoundry.app.name.keyword
+                        order: {_count: "desc"}
+                        size: 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          size: 0
+        }
+      }
+    }
+    {
+      name: nodes
+      source: tree
+      transform: [
+        {type: "filter", expr: "datum.children"}
+        {
+          type: formula
+          expr: datum.depth == 1 ? datum.values[0].values[0].values[0].org : datum.depth == 2 ? datum.values[0].values[0].space : datum.depth == 3 ? datum.values[0].app : ''
+          as: name
+        }
+      ]
+    }
+    {
+      name: leaves
+      source: tree
+      transform: [
+        {type: "filter", expr: "!datum.children"}
+      ]
+    }
+  ]
+  scales: [
+    {
+      name: color
+      type: ordinal
+      domain: {data: "nodes", field: "name"}
+      // "range": [
+      //   "#3182bd", "#6baed6", "#9ecae1", "#c6dbef"
+      // ]
+      // scheme: blues
+      scheme: greens
+    }
+    {
+      name: size
+      type: ordinal
+      domain: [0, 1, 2, 3]
+      range: [256, 28, 20, 14]
+    }
+    {
+      name: opacity
+      type: ordinal
+      domain: [0, 1, 2, 3]
+      range: [0.15, 0.5, 0.8, 1]
+    }
+  ]
+  marks: [
+    {
+      type: rect
+      from: {data: "nodes"}
+      interactive: false
+      encode: {
+        update: {
+          fill: {scale: "color", field: "name"}
+          x: {field: "x0"}
+          y: {field: "y0"}
+          x2: {field: "x1"}
+          y2: {field: "y1"}
+        }
+      }
+    }
+    {
+      type: rect
+      from: {data: "leaves"}
+      encode: {
+        update: {
+          stroke: {value: "#000"}
+          x: {field: "x0"}
+          y: {field: "y0"}
+          x2: {field: "x1"}
+          y2: {field: "y1"}
+          fill: {value: "transparent"}
+          tooltip: {signal: "{org: datum.org, space: datum.space, app : datum.app, count : datum.count }"}
+        }
+        hover: {
+          fill: {value: "orange"}
+        }
+      }
+    }
+    {
+      type: text
+      from: {data: "nodes"}
+      interactive: false
+      encode: {
+        update: {
+          font: {value: "Helvetica Neue, Arial"}
+          align: {value: "center"}
+          baseline: {value: "middle"}
+          fill: {value: "#000"}
+          limit : {value: 200}
+          text: {signal: "datum.depth == 3 && (datum.x1-datum.x0) > 50 ? datum.name : ''"}
+          fontSize: {value: 12}
+          // fontSize: {scale: "size", field: "depth"}
+          fillOpacity: {scale: "opacity", field: "depth"}
+          x: {signal: "0.5 * (datum.x0 + datum.x1)"}
+          y: {signal: "0.5 * (datum.y0 + datum.y1)"}
+        }
+      }
+    }
+  ]
+}

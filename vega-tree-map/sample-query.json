@@ -1,0 +1,60 @@
+POST nozzlebeat-*/_search
+{
+  "size": 0,
+  "_source": {
+    "excludes": []
+  },
+   "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "@timestamp": {
+                "gte" : "now-15m/m",
+                "lt" :  "now/m"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  },
+  "aggs": {
+    "org": {
+      "terms": {
+        "field": "cf.org.name",
+        "order": {
+          "_count": "desc"
+        },
+        "size": 5
+      },
+      "aggs": {
+        "space": {
+          "terms": {
+            "field": "cf.space.name",
+            "order": {
+              "_count": "desc"
+            },
+            "size": 5
+          },
+          "aggs": {
+            "app": {
+              "terms": {
+                "field": "cf.app.name",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 5
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

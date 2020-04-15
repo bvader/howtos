@@ -1,0 +1,265 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.3.0.json",
+  "signals": [
+    {
+      "name": "layout",
+      "value": "squarify",
+      "bind": {"input": "select", "options": ["squarify", "binary", "slicedice"]}
+    },
+    {"name": "aspectRatio", "value": 1.6, "bind": {"input": "range", "min": 1, "max": 5, "step": 0.1}}
+  ],
+  "data": [
+    {
+      "name": "tree",
+      "format": {"property": "aggregations.org.buckets"},
+      "transform": [
+        {"type": "flatten", "fields": ["space.buckets"], "as": ["space_obj"]},
+        {"type": "flatten", "fields": ["space_obj.app.buckets"], "as": ["app_obj"]},
+        {
+          "type": "project",
+          "fields": ["key", "space_obj.key", "app_obj.key", "app_obj.doc_count"],
+          "as": ["org", "space", "app", "size"]
+        },
+        {"type": "nest", "keys": ["org", "space", "app"], "generate": true},
+        {
+          "type": "treemap",
+          "field": "size",
+          "sort": {"field": "value", "order": "descending"},
+          "round": true,
+          "method": {"signal": "layout"},
+          "ratio": {"signal": "aspectRatio"},
+          "size": [{"signal": "width"}, {"signal": "height"}]
+        }
+      ],
+      "values": {
+        "took": 44,
+        "timed_out": false,
+        "_shards": {"total": 1, "successful": 1, "skipped": 0, "failed": 0},
+        "hits": {"total": {"value": 10000, "relation": "gte"}, "max_score": null, "hits": []},
+        "aggregations": {
+          "org": {
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 0,
+            "buckets": [
+              {
+                "key": "elastic-demo-org",
+                "doc_count": 13183,
+                "space": {
+                  "doc_count_error_upper_bound": 0,
+                  "sum_other_doc_count": 0,
+                  "buckets": [
+                    {
+                      "key": "demo-space-sandbox",
+                      "doc_count": 11111,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "cardatabase-back-end", "doc_count": 10833},
+                          {"key": "cardatabase-front-end", "doc_count": 2674},
+                          {"key": "car-value-estimator", "doc_count": 112}
+                        ]
+                      }
+                    },
+                    {
+                      "key": "demo-space-all",
+                      "doc_count": 20717,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "spring-music", "doc_count": 12319},
+                          {"key": "spring-petclinic-rest", "doc_count": 7638},
+                          {"key": "spring-petclinic-front-end", "doc_count": 760}
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "system",
+                "doc_count": 5780,
+                "space": {
+                  "doc_count_error_upper_bound": 0,
+                  "sum_other_doc_count": 0,
+                  "buckets": [
+                    {
+                      "key": "system",
+                      "doc_count": 3624,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "worker", "doc_count": 2631},
+                          {"key": "server", "doc_count": 414},
+                          {"key": "js-blue", "doc_count": 392},
+                          {"key": "p-invitations-blue", "doc_count": 120},
+                          {"key": "app-usage-scheduler", "doc_count": 67}
+                        ]
+                      }
+                    },
+                    {
+                      "key": "healthwatch",
+                      "doc_count": 1473,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 114,
+                        "buckets": [
+                          {"key": "healthwatch-ingestor", "doc_count": 311},
+                          {"key": "smoke-test", "doc_count": 190},
+                          {"key": "healthwatch", "doc_count": 148},
+                          {"key": "healthwatch-alerts", "doc_count": 143},
+                          {"key": "healthwatch-aggregator", "doc_count": 119},
+                          {"key": "healthwatch-worker", "doc_count": 119},
+                          {"key": "healthwatch-api", "doc_count": 114},
+                          {"key": "cf-health-check", "doc_count": 98},
+                          {"key": "canary-health-check", "doc_count": 59},
+                          {"key": "healthwatch-meta-monitor", "doc_count": 58}
+                        ]
+                      }
+                    },
+                    {
+                      "key": "notifications-with-ui",
+                      "doc_count": 386,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "notifications", "doc_count": 267},
+                          {"key": "notifications-ui", "doc_count": 119}
+                        ]
+                      }
+                    },
+                    {
+                      "key": "autoscaling",
+                      "doc_count": 237,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "autoscale", "doc_count": 177},
+                          {"key": "autoscale-api", "doc_count": 60}
+                        ]
+                      }
+                    },
+                    {
+                      "key": "nfs",
+                      "doc_count": 60,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [{"key": "nfsbroker", "doc_count": 60}]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": "elastic-sa-sandbox",
+                "doc_count": 4840,
+                "space": {
+                  "doc_count_error_upper_bound": 0,
+                  "sum_other_doc_count": 0,
+                  "buckets": [
+                    {
+                      "key": "apm-test",
+                      "doc_count": 2490,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [{"key": "estimator", "doc_count": 2490}]
+                      }
+                    },
+                    {
+                      "key": "demo-space-stephenb",
+                      "doc_count": 2350,
+                      "app": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                          {"key": "car-value", "doc_count": 610},
+                          {"key": "cardatabase-back-end", "doc_count": 590},
+                          {"key": "cardatabase-front", "doc_count": 580},
+                          {"key": "firehose-to-syslog", "doc_count": 570}
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "nodes",
+      "source": "tree",
+      "transform": [
+        {"type": "filter", "expr": "datum.children"},
+        {
+          "type": "formula",
+          "expr": "datum.depth == 1 ? datum.values[0].values[0].values[0].org : datum.depth == 2 ? datum.values[0].values[0].space : datum.depth == 3 ? datum.values[0].app : ''",
+          "as": "name"
+        }
+      ]
+    },
+    {"name": "leaves", "source": "tree", "transform": [{"type": "filter", "expr": "!datum.children"}]}
+  ],
+  "scales": [
+    {"name": "color", "type": "ordinal", "domain": {"data": "nodes", "field": "name"}, "scheme": "greens"},
+    {"name": "size", "type": "ordinal", "domain": [0, 1, 2, 3], "range": [256, 30, 24, 14]},
+    {"name": "opacity", "type": "ordinal", "domain": [0, 1, 2, 3], "range": [0.15, 0.25, 0.5, 1]}
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "nodes"},
+      "interactive": false,
+      "encode": {
+        "update": {
+          "fill": {"scale": "color", "field": "name"},
+          "x": {"field": "x0"},
+          "y": {"field": "y0"},
+          "x2": {"field": "x1"},
+          "y2": {"field": "y1"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "leaves"},
+      "encode": {
+        "update": {
+          "stroke": {"value": "#000"},
+          "x": {"field": "x0"},
+          "y": {"field": "y0"},
+          "x2": {"field": "x1"},
+          "y2": {"field": "y1"},
+          "fill": {"value": "transparent"},
+          "tooltip": {"signal": "{org: datum.org, space: datum.space, app : datum.app, count : datum.size }"}
+        },
+        "hover": {"fill": {"value": "orange"}}
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "nodes"},
+      "interactive": false,
+      "encode": {
+        "update": {
+          "font": {"value": "Helvetica Neue, Arial"},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fill": {"value": "#000"},
+          "text": {"signal": "datum.depth >= 3 && (datum.x1-datum.x0) > 60 ? datum.name: ''"},
+          "fontSize": {"scale": "size", "field": "depth"},
+          "fillOpacity": {"scale": "opacity", "field": "depth"},
+          "x": {"signal": "0.5 * (datum.x0 + datum.x1)"},
+          "y": {"signal": "0.5 * (datum.y0 + datum.y1)"}
+        }
+      }
+    }
+  ]
+}
