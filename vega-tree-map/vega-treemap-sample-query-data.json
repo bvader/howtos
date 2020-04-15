@@ -1,0 +1,480 @@
+#
+# {
+  "$schema": "https://vega.github.io/schema/vega/v4.3.0.json",
+  "signals": [
+    {
+      "name": "layout",
+      "value": "squarify",
+      "bind": {
+        "input": "select",
+        "options": ["squarify", "binary", "slicedice"]
+      }
+    },
+    {
+      "name": "aspectRatio",
+      "value": 1.6,
+      "bind": {"input": "range", "min": 1, "max": 5, "step": 0.1}
+    }
+  ],
+  "data": [
+    {
+      "name": "tree",
+      "format": {"property": "aggregations.host.buckets"},
+      "transform": [
+        {"type": "flatten", "fields": ["device.buckets"], "as": ["device_obj"]},
+        {
+          "type": "flatten",
+          "fields": ["device_obj.path.buckets"],
+          "as": ["path_obj"]
+        },
+        {
+          "type": "project",
+          "fields": [
+            "key",
+            "device_obj.key",
+            "path_obj.key",
+            "path_obj.disk_total.value"
+          ],
+          "as": ["host", "device", "path", "size"]
+        },
+        {"type": "nest", "keys": ["host", "device", "path"], "generate": true},
+        {
+          "type": "treemap",
+          "field": "size",
+          "sort": {"field": "value", "order": "descending"},
+          "round": true,
+          "method": {"signal": "layout"},
+          "ratio": {"signal": "aspectRatio"},
+          "size": [{"signal": "width"}, {"signal": "height"}]
+        }
+      ],
+      "url": {
+        "%context%": true,
+        "%timefield%": "@timestamp",
+        "index": "telegraf-*",
+        "body": {
+          "aggs": {
+            "host": {
+              "terms": {
+                "field": "tag.host",
+                "order": {"_count": "desc"},
+                "size": 5
+              },
+              "aggs": {
+                "device": {
+                  "terms": {
+                    "field": "tag.device",
+                    "order": {"_count": "desc"},
+                    "size": 5
+                  },
+                  "aggs": {
+                    "path": {
+                      "terms": {
+                        "field": "tag.path",
+                        "order": {"disk_total.value": "desc"},
+                        "size": 5
+                      },
+                      "aggs": {
+                        "disk_total": {"max": {"field": "telegraf.disk.total"}}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "size": 0
+        }
+      }
+    },
+    {
+      "name": "nodes",
+      "source": "tree",
+      "transform": [
+        {"type": "filter", "expr": "datum.children"},
+        {
+          "type": "formula",
+          "expr": "datum.depth == 1 ? datum.values[0].values[0].values[0].host : datum.depth == 2 ? datum.values[0].values[0].device : datum.depth == 3 ? datum.values[0].path : ''",
+          "as": "name"
+        }
+      ]
+    },
+    {
+      "name": "leaves",
+      "source": "tree",
+      "transform": [{"type": "filter", "expr": "!datum.children"}]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": {"data": "nodes", "field": "name"},
+      "scheme": "greens"
+    },
+    {
+      "name": "size",
+      "type": "ordinal",
+      "domain": [0, 1, 2, 3],
+      "range": [256, 30, 24, 14]
+    },
+    {
+      "name": "opacity",
+      "type": "ordinal",
+      "domain": [0, 1, 2, 3],
+      "range": [0.15, 0.25, 0.5, 1]
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "nodes"},
+      "interactive": false,
+      "encode": {
+        "update": {
+          "fill": {"scale": "color", "field": "name"},
+          "x": {"field": "x0"},
+          "y": {"field": "y0"},
+          "x2": {"field": "x1"},
+          "y2": {"field": "y1"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "leaves"},
+      "encode": {
+        "update": {
+          "stroke": {"value": "#000"},
+          "x": {"field": "x0"},
+          "y": {"field": "y0"},
+          "x2": {"field": "x1"},
+          "y2": {"field": "y1"},
+          "fill": {"value": "transparent"},
+          "tooltip": {
+            "signal": "{Host: datum.host, Device: datum.device, Path : datum.path, 'Size GB': format(datum.size / (1024*1024*1024), ',.0f')}"
+          }
+        },
+        "hover": {"fill": {"value": "orange"}}
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "nodes"},
+      "interactive": false,
+      "encode": {
+        "update": {
+          "font": {"value": "Helvetica Neue, Arial"},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fill": {"value": "#000"},
+          "text": {
+            "signal": "datum.depth >= 3 && (datum.x1-datum.x0) > 60 ? datum.name: ''"
+          },
+          "fontSize": {"scale": "size", "field": "depth"},
+          "fillOpacity": {"scale": "opacity", "field": "depth"},
+          "x": {"signal": "0.5 * (datum.x0 + datum.x1)"},
+          "y": {"signal": "0.5 * (datum.y0 + datum.y1)"}
+        }
+      }
+    }
+  ]
+}
+
+#
+# Data
+#
+
+{
+  "took" : 5,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1989,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "host" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "stephenb-metrics-test",
+          "doc_count" : 697,
+          "device" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "tmpfs",
+                "doc_count" : 90,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 15,
+                  "buckets" : [
+                    {
+                      "key" : "/dev/shm",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 3.916705792E9
+                      }
+                    },
+                    {
+                      "key" : "/sys/fs/cgroup",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 3.916705792E9
+                      }
+                    },
+                    {
+                      "key" : "/run",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 7.83343616E8
+                      }
+                    },
+                    {
+                      "key" : "/run/snapd/ns",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 7.83343616E8
+                      }
+                    },
+                    {
+                      "key" : "/run/user/1013",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 7.8333952E8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda1",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.03880228864E11
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda15",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/boot/efi",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.09422592E8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "key" : "pcf-mysql-0",
+          "doc_count" : 646,
+          "device" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "tmpfs",
+                "doc_count" : 75,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/dev/shm",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 2.596892672E9
+                      }
+                    },
+                    {
+                      "key" : "/sys/fs/cgroup",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 2.596892672E9
+                      }
+                    },
+                    {
+                      "key" : "/run",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 5.19380992E8
+                      }
+                    },
+                    {
+                      "key" : "/run/user/1013",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 5.19376896E8
+                      }
+                    },
+                    {
+                      "key" : "/run/lock",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 5242880.0
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda1",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 2.0629221376E10
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda15",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/boot/efi",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.09422592E8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "key" : "stephenb-metrics-test-es1",
+          "doc_count" : 646,
+          "device" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "tmpfs",
+                "doc_count" : 75,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/dev/shm",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 7.879667712E9
+                      }
+                    },
+                    {
+                      "key" : "/sys/fs/cgroup",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 7.879667712E9
+                      }
+                    },
+                    {
+                      "key" : "/run",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.575936E9
+                      }
+                    },
+                    {
+                      "key" : "/run/user/1013",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.575931904E9
+                      }
+                    },
+                    {
+                      "key" : "/run/lock",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 5242880.0
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda1",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 2.07944105984E11
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "sda15",
+                "doc_count" : 15,
+                "path" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "/boot/efi",
+                      "doc_count" : 15,
+                      "disk_total" : {
+                        "value" : 1.09422592E8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
