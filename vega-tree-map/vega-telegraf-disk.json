@@ -151,7 +151,7 @@
           "y2": {"field": "y1"},
           "fill": {"value": "transparent"},
           "tooltip": {
-            "signal": "{Host: datum.host, Device: datum.device, Path : datum.path, 'Size GB': (datum.size / (1024*1024*1024)) }"
+            "signal": "{Host: datum.host, Device: datum.device, Path : datum.path, 'Size GB': format(datum.size / (1024*1024*1024), ',.0f')}"
           }
         },
         "hover": {"fill": {"value": "orange"}}
