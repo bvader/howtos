@@ -1,6 +1,7 @@
 ## Commands / Tips for getting Elastic Stack Builds
 
 Base url Tip use Firefox If you want to see pretty print
+
 **Note**  as versions approach Release the go from 7.x to 7.7 as an example
 https://artifacts-api.elastic.co/v1
 
