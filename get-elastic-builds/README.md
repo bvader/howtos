@@ -19,7 +19,7 @@ Equivalent
 curl -O
 http --download
 
-# After you get results use `curl -O` to download actual build
+# After you get results use `curl -O` or `http --download` to download actual build
 # Docker can get any image from artifact repo, but AFAICT 
 # I can only get the latest official build or SNAPSHOT
 
