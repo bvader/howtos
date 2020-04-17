@@ -3,7 +3,7 @@
 Base url Tip use Firefox If you want to see pretty print
 
 **Note**  as versions approach Release the go from 7.x to 7.7 as an example
-https://artifacts-api.elastic.co/v1/branches/7.7
+https://artifacts-api.elastic.co/v1/branches
 
 **Note** the commands beload use `jq` which is a json parser & formatter. The retrun either the full path to the artifacts or meta data about the artifacts
 - https://stedolan.github.io/jq/
