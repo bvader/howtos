@@ -5,9 +5,9 @@ Base url Tip use Firefox If you want to see pretty print
 https://artifacts-api.elastic.co/v1
 
 **Note** the commands beload use `jq` which is a json parser & formatter. The retrun either the full path to the artifacts or meta data about the artifacts
-https://stedolan.github.io/jq/
-https://jqplay.org/
-https://httpie.org/
+- https://stedolan.github.io/jq/
+- https://jqplay.org/
+- https://httpie.org/
 
 ```
 curl and HTTP(ie)
