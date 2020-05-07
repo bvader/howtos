@@ -58,6 +58,9 @@ curl -s 'https://artifacts-api.elastic.co/v1/branches/7.7' | jq '.branch.builds[
 # Get Attributes for specfic build 7.7.0-c32dea82 then get build
 curl -s 'https://artifacts-api.elastic.co/v1/branches/7.7' | jq '.branch.builds[] | select(.build_id == "7.7.0-c32dea82")' | head -n 20
 
+# Get Metadata about 3 most recent 7.7 builds
+curl -s 'https://artifacts-api.elastic.co/v1/branches/7.7' | jq '.branch.builds[0,1,2] | { branch, build_id, end_time, manifest_version, release_branch, start_time, version }'
+
 # Get Filebeat Specific Build 7.7.0-c32dea82 tar
 curl -s 'https://artifacts-api.elastic.co/v1/branches/7.7' | jq '.branch.builds[].projects[].packages[] | select(.type == "tar").url' | grep linux | grep 7.7.0-c32dea82 | grep filebeat
 
