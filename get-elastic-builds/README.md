@@ -38,7 +38,7 @@ curl -s 'https://artifacts-api.elastic.co/v1/branches/7.7' | jq '.branch.builds[
 curl -s 'https://artifacts-api.elastic.co/v1/branches/7.x' | jq '.branch.builds[0].projects[].packages[] | select(.type == "tar").url'
 
 # Get Latest 7.x Builds for filebeat
-curl -s 'https://artifacts-api.elastic.co/v1/branches/7.x' | jq '.branch.builds[0].projects[].packages[] | select(.type == "tar").url' | grep darwin | grep filebeat
+curl -s 'https://artifacts-api.elastic.co/v1/branches/7.x' | jq '.branch.builds[0].projects[].packages[] | select(.type == "tar").url' | grep linux | grep filebeat
 
 # Get Latest 7.x Builds for specfic build filebeat-7.8.0-SNAPSHOT-linux-x86_64.tar.gz
 curl -s 'https://artifacts-api.elastic.co/v1/branches/7.x' | jq '.branch.builds[0].projects[].packages[] | select(.type == "tar").url' | grep linux | grep filebeat-7.8.0-SNAPSHOT-linux-x86_64.tar.gz
