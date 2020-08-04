@@ -1,4 +1,4 @@
-# Migrating Data from 
+## Migrating Data from Elasticsearch Cluster that is behind a FW to ESS in Elastic Cloud
 ### Question / Problem Statement
 I want to migrate 1 or more indices from y existing  cluster(s) however they are in my data center and I would need to open a network firewall rule so that the reindex API can reach the prod cluster. For this, I need the origin IP of the new cluster. How do I get it? I tried adding the IP of the Elastic node of the new cluster (via DNS lookup). It did not work.
 
@@ -13,14 +13,16 @@ https://www.elastic.co/guide/en/cloud/current/ec-migrate-data.html
 There are 2 simple "push" scripts / methods that you can run to push data that way the data is pushed outbound and should alleviate the FW issue.
 
 ### Options 2a:
-Elasticdump : Very easy perhaps a bit slow. I attached a simple script that should work, it may be a bit slow but it should work.
+[Elasticdump](https://www.npmjs.com/package/elasticdump) : Very easy perhaps a bit slow. I attached a simple script that should work, it may be a bit slow but it should work.
 https://www.npmjs.com/package/elasticdump
 1. Install elasticdump
 2. Edit the `migrate-index-elasticdump.sh` script to put your index and endpoint parameters in it. It Loads, the index setting, mappings then the index data. 
 3. Run `$ ./migrate-index-elasticdump.sh`
 
 ### Option 2b: 
-Logstash: Little more work, much much faster. Very straightforward and there are some additional settings you can use to affect performance.  It simply uses the logstash elasticsearch input and output plugins
+[Logstash](https://www.elastic.co/guide/en/logstash/current/index.html): Little more work, much much faster. Very straightforward and there are some additional settings you can use to affect performance.  It simply uses the logstash elasticsearch [input](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-elasticsearch.html) and [output](https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html) plugins
+
+[Small Elasticsearch Miggration](./migration-tools/README.md)
 
 You will need to put the index mapping in first manually (you could actually use the first 2 parts of the elasticdump script to do this or just do a PUT in the dev tools)
 
