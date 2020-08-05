@@ -42,7 +42,7 @@ NOTE:  the -r will reload your config to you can trial and error without restart
 NOTE : Logstash does not stop after the migration, it is waiting for additional documents so you will need to ^C
 `$ ./bin/logstash -r -f ./config/migrate-index-logstash.conf`
 
-Performance tuning if needed
+Performance and tuning error handling if needed
 
 1. Increase the JVM heap
 edit `./config/jvm.options`
@@ -54,3 +54,11 @@ and increase the heap size to 4-8g. They must be equal.
 -Xms8g
 -Xmx8g
 ```
+2. Failed Documents
+Enable [Dead Letter Queue](https://www.elastic.co/guide/en/logstash/current/dead-letter-queues.html)
+Dead letter queues are disabled by default. To enable dead letter queues, set the `dead_letter_queue_enable` option in the `logstash.yml` settings file:
+
+`dead_letter_queue.enable: true`
+
+
+
