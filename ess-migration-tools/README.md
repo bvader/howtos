@@ -22,7 +22,7 @@ https://www.npmjs.com/package/elasticdump
 ### Option 2b: 
 [Logstash](https://www.elastic.co/guide/en/logstash/current/index.html): Little more work, much much faster. Very straightforward and there are some additional settings you can use to affect performance.  It simply uses the logstash elasticsearch [input](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-elasticsearch.html) and [output](https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html) plugins
 
-[Small Elasticsearch Miggration](./migration-tools/README.md)
+
 
 You will need to put the index mapping in first manually (you could actually use the first 2 parts of the elasticdump script to do this or just do a PUT in the dev tools)
 
