@@ -1,0 +1,215 @@
+# Fields that can be edited
+# dataMultiplier : Used to adjust if number need to be turned into a percent
+# colorValues : Choose your colors
+# index : The index pattern or index
+# field : The actual metric field
+# %autointerval% : Set to 150 I found that to be a good number and provide a nice graph, set to true if you want to use auto interval
+
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.json",
+  "signals": [
+    {"name": "radius", "update": "min(width, height)*0.47"},
+    {"name": "spread", "update": "110"},
+    {"name": "dataMultiplier", "update": "1.0"},
+    {"name": "lastDatum", "update": "data('esdata')[length(data('esdata'))-1]"},
+    {"name": "colorValues", "value": ["#31A82D", "#D67727", "#E03435"]}
+  ],
+  "data": [
+    {
+      "_note_": "this is a comment",
+      "name": "gauge_arc",
+      "values": [{"value": 0.5}, {"value": 0.3}, {"value": 0.2}],
+      "transform": [
+        {
+          "type": "pie",
+          "field": "value",
+          "startAngle": {"signal": "-1 * spread * PI / 180"},
+          "endAngle": {"signal": "spread * PI / 180"}
+        },
+        {
+          "type": "window",
+          "ops": ["sum", "row_number"],
+          "fields": ["value", null],
+          "as": ["cumulative_value", "row"]
+        }
+      ]
+    },
+    {
+      "name": "color_ranges",
+      "source": "gauge_arc",
+      "transform": [
+        {"type": "filter", "expr": "datum.row < length(data('gauge_arc'))"}
+      ]
+    },
+    {
+      "name": "esdata",
+      "format": {"property": "aggregations.time_buckets.buckets"},
+      "transform": [
+        {"type": "filter", "expr": "datum.metric.value"},
+        {
+          "type": "formula",
+          "expr": "datum.metric.value * dataMultiplier",
+          "as": "val"
+        },
+        {"type": "project", "fields": ["key", "val"], "as": ["ts", "val"]}
+      ],
+      "url": {
+        "%context%": true,
+        "%timefield%": "@timestamp",
+        "index": "metricbeat-*",
+        "body": {
+          "aggs": {
+            "time_buckets": {
+              "aggs": {
+                "metric": {"avg": {"field": "system.cpu.total.norm.pct"}}
+              },
+              "date_histogram": {
+                "field": "@timestamp",
+                "interval": {"%autointerval%": 150},
+                "extended_bounds": {
+                  "min": {"%timefilter%": "min"},
+                  "max": {"%timefilter%": "max"}
+                }
+              }
+            }
+          },
+          "size": 0
+        }
+      }
+    }
+  ],
+  "scales": [
+    {
+      "name": "ts_scale_y",
+      "type": "linear",
+      "domain": {"data": "esdata", "field": "val"},
+      "range": [{"signal": "height"}, {"signal": "height*0.7"}]
+    },
+    {
+      "name": "ts_scale_x",
+      "type": "time",
+      "domain": {"data": "esdata", "field": "ts"},
+      "range": "width"
+    },
+    {
+      "name": "scale_angle",
+      "type": "linear",
+      "domain": [0, 1],
+      "range": [
+        {"signal": "-1 * spread * PI / 180"},
+        {"signal": "spread * PI / 180"}
+      ]
+    },
+    {
+      "name": "color",
+      "type": "threshold",
+      "domain": {"data": "color_ranges", "field": "cumulative_value"},
+      "range": {"signal": "colorValues"}
+    }
+  ],
+  "marks": [
+    {
+      "type": "arc",
+      "name": "legendArc",
+      "from": {"data": "gauge_arc"},
+      "encode": {
+        "update": {
+          "fill": {
+            "signal": "scale('color', datum.cumulative_value - datum.value)"
+          },
+          "x": {"signal": "width / 2"},
+          "y": {"signal": "height / 2"},
+          "startAngle": {"field": "startAngle"},
+          "endAngle": {"field": "endAngle"},
+          "padAngle": {"value": 0.01},
+          "innerRadius": {"signal": "radius * 0.95"},
+          "outerRadius": {"signal": "radius"},
+          "cornerRadius": {"value": 2}
+        }
+      }
+    },
+    {
+      "type": "arc",
+      "name": "backgroundValueArc",
+      "encode": {
+        "update": {
+          "fill": {"value": "#303030"},
+          "fillOpacity": {"value": 0.3},
+          "x": {"signal": "width / 2"},
+          "y": {"signal": "height / 2"},
+          "startAngle": {"signal": "scale('scale_angle', 0)"},
+          "endAngle": {"signal": "scale('scale_angle', 1)"},
+          "padAngle": {"value": 0.01},
+          "innerRadius": {"signal": "radius * 0.55"},
+          "outerRadius": {"signal": "radius * 0.91"},
+          "cornerRadius": {"value": 2}
+        }
+      }
+    },
+    {
+      "type": "arc",
+      "name": "foregroundValueArc",
+      "encode": {
+        "update": {
+          "fill": {"signal": "scale('color', lastDatum ? lastDatum.val : 0)"},
+          "x": {"signal": "width / 2"},
+          "y": {"signal": "height / 2"},
+          "startAngle": {"signal": "scale('scale_angle', 0)"},
+          "endAngle": {
+            "signal": "scale('scale_angle', lastDatum ? lastDatum.val : 0)"
+          },
+          "padAngle": {"value": 0.01},
+          "innerRadius": {"signal": "radius * 0.55"},
+          "outerRadius": {"signal": "radius * 0.91"},
+          "cornerRadius": {"value": 2}
+        }
+      }
+    },
+    {
+      "type": "area",
+      "from": {"data": "esdata"},
+      "encode": {
+        "update": {
+          "fill": {"value": "#1F6EB1"},
+          "opacity": {"value": 0.2},
+          "x": {"scale": "ts_scale_x", "field": "ts"},
+          "y": {"scale": "ts_scale_y", "value": 0},
+          "y2": {"scale": "ts_scale_y", "field": "val"},
+          "tooltip": {
+            "signal": "{'Time' : timeFormat(datum.ts, '%c'), 'UTC Time' : utcFormat(datum.ts, '%c'), 'value' : format(datum.val, ',.1%')}"
+          }
+        }
+      }
+    },
+    {
+      "type": "line",
+      "from": {"data": "esdata"},
+      "encode": {
+        "update": {
+          "stroke": {"value": "#1F6EB1"},
+          "x": {"scale": "ts_scale_x", "field": "ts"},
+          "y": {"scale": "ts_scale_y", "field": "val"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "name": "centerTextValue",
+      "encode": {
+        "update": {
+          "text": {
+            "signal": "lastDatum ? format(lastDatum.val, ',.1%') : 'No Data'"
+          },
+          "fill": {
+            "signal": "lastDatum ? scale('color', lastDatum.val) : '#E03435'"
+          },
+          "x": {"signal": "width / 2 + radius * 0.02"},
+          "y": {"signal": "height / 2"},
+          "align": {"value": "center"},
+          "fontSize": {"signal": "radius*0.2"},
+          "fontWeight": {"value": "bold"}
+        }
+      }
+    }
+  ]
+}
