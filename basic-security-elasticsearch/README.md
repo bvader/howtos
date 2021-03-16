@@ -7,7 +7,8 @@ For Further Details Please Refer to the Official Documentation:
 [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
 
-###What we are doing?
+### What we are doing?
+
 This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled. We will then be able to bind the Elasticsearch and Kibana to the network so it can be reached from another system.  **Do NOT bind your Elasticsearch node or cluster to the network unless you secure your cluster and Kibana FIRST!**
 
 **Notes:** 
