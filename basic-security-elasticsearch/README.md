@@ -26,7 +26,7 @@ The Macro Steps we are going to follow are below. These are documented in more d
 * Setup SSL/TLS
 * Test 
 
-### Lets get started
+### Lets get started...
 [Download and Install Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html)
 
 ```bash
