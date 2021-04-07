@@ -134,6 +134,7 @@ Elasticsearch Setup Basic Authentication. At this point the is a random bootstra
 Test with `curl`. If you have done everything right you should get an out similar to this, if so congratulations you have a single elasticsearch node with authentication and SSL/TLS!
 
 ```bash
+cd /etc/elasticsearch
 curl -u "elastic:myawesomepassword" --cacert certs/selfca.pem https://localhost:9200
 {
   "name" : "my-host-name",
