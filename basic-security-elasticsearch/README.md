@@ -7,7 +7,8 @@ For Further Details Please Refer to the Official Documentation:
 [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
 
-###What we are doing?
+### What we are doing?
+
 This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled. We will then be able to bind the Elasticsearch and Kibana to the network so it can be reached from another system.  **Do NOT bind your Elasticsearch node or cluster to the network unless you secure your cluster and Kibana FIRST!**
 
 **Notes:** 
@@ -133,6 +134,7 @@ Elasticsearch Setup Basic Authentication. At this point the is a random bootstra
 Test with `curl`. If you have done everything right you should get an out similar to this, if so congratulations you have a single elasticsearch node with authentication and SSL/TLS!
 
 ```bash
+cd /etc/elasticsearch
 curl -u "elastic:myawesomepassword" --cacert certs/selfca.pem https://localhost:9200
 {
   "name" : "my-host-name",
@@ -224,6 +226,9 @@ elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/certs/selfca.pem" ]
 
 # To disregard the validity of SSL certificates, change this setting's value to 'none'.
 #elasticsearch.ssl.verificationMode: none
+
+# Saved Object Encryption Key : Pick your own
+xpack.encryptedSavedObjects.encryptionKey: "salkdjfhasldfkjhasdlfkjhasdflkasjdfhslkajfhasldkfjhasdlaksdjfh"
 ```
 
 Start, stop and status commands
