@@ -181,11 +181,12 @@ cp /etc/elasticsearch/certs/selfca.pem .
 chmod 644 *
 ```
 
-Create a [Kibana keystore](https://www.elastic.co/guide/en/kibana/current/secure-settings.html) and put the elasticsearch password in it, this way it is not exposed in the `kibana.yml` file. 
+Create a [Kibana keystore](https://www.elastic.co/guide/en/kibana/current/secure-settings.html) and put the elasticsearch password in it, this way it is not exposed in the `kibana.yml` file. And then make sure it is readable by the kibana user
 
 ```bash
 /usr/share/kibana/bin/kibana-keystore create
 /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+chown kibana:kibana /var/lib/kibana/kibana.keystore
 ```
 
 
