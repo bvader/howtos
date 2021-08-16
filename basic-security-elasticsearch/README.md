@@ -184,8 +184,8 @@ chmod 644 *
 Create a [Kibana keystore](https://www.elastic.co/guide/en/kibana/current/secure-settings.html) and put the elasticsearch password in it, this way it is not exposed in the `kibana.yml` file. 
 
 ```bash
-/usr/share/kibana/bin/kibana-keystore --allow-root create
-/usr/share/kibana/bin/kibana-keystore --allow-root add elasticsearch.password
+/usr/share/kibana/bin/kibana-keystore create
+/usr/share/kibana/bin/kibana-keystore add elasticsearch.password
 ```
 
 
