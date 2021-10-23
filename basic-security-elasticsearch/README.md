@@ -1,5 +1,5 @@
 
-## Single Node Secured Elasticsearch + Kibana with Elastic generated Self Signed Certs (updated)
+## Single Node Secured Elasticsearch + Kibana with Elastic generated self signed certs (updated)
 
 #### NOTE / DISCLAIMER: **This configuration should only be used for Dev / POC purposes this is NOT suitable for production use.**
 
