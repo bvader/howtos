@@ -13,8 +13,8 @@ This is simple / minimal quickstart to create a single Elasticsearch node and Ki
 ![Elastic Securty Layers](https://www.elastic.co/guide/en/elasticsearch/reference/current/images/elastic-security-overview.png)
 
 **Notes:** 
-* This example is using Elastic Stack 7.15.1 and Ubuntu 20.04 LTS using a Deb Package
-* We are colocating Elasticsearch and Kibana for Dev / POC only for POC / Dev only
+* This example is using Elastic Stack 7.15.1 and Ubuntu 20.04 LTS using a Deb Package, if you use another method such as the tar.gz you will need to adjust the paths. 
+* We are colocating Elasticsearch and Kibana for POC / Dev purposes only.
 * Many of these commands / directores require `root` access so either be prepared to `sudo` most of the commands or just do a `sudo -i` for the duration of the session... your choice...
 * There are many important settings for Elasticsearch that are not in the example please review them [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html) before moving on from POC / Dev mode
 * All the IP Adresses are just examples and are not to be taken literally.
