@@ -1,5 +1,5 @@
 
-## Single Node Secured Elasticsearch + Kibana with Elastic generated Self Signed Certs
+## Single Node Secured Elasticsearch + Kibana with Elastic generated Self Signed Certs (updated)
 
 #### NOTE / DISCLAIMER: **This configuration should only be used for Dev / POC purposes this is NOT suitable for production use.**
 
@@ -7,8 +7,7 @@ For Further Details Please Refer to the Official Documentation: [Elasticsearch](
 
 ### What we are doing?
 
-This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled (we will enable SSL for both HTTPS and Transport layer even though it is just a single node). This is a direct path to the Basic Security + HTTPs shown in the diagram [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html) and described [Configure security for the Elastic Stack
-](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html#security-basic-https-overview). We will then be able to bind the Elasticsearch and Kibana to the network so it can be safely reached from another system.  
+This is simple / minimal quickstart to create a single Elasticsearch node and Kibana with basic authentication and SSL/TLS enabled (we will enable SSL for both HTTPS and Transport layer even though it is just a single node). This is a condensed / direct path to the Basic Security + HTTPs shown in the diagram [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html) and described [Configure security for the Elastic Stack](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html#security-basic-https-overview). We will then be able to bind the Elasticsearch and Kibana to the network so it can be safely reached from another system.  
 **Do NOT bind your Elasticsearch node or cluster to the network unless you secure your cluster and Kibana FIRST!** 
 
 ![Elastic Securty Layers](https://www.elastic.co/guide/en/elasticsearch/reference/current/images/elastic-security-overview.png)
@@ -55,13 +54,9 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
 ...
 ```
 
-We will be setting up TLS on the node for both the [Transport Layer](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/security-basic-setup.html) and [HTTPS](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/security-basic-setup-https.html). We will creating self-signed certs using the `elasticsearch-certutil` tool. First we will create a CA (certificate authority) and then use that to generate the certificates. 
-
-Note you will want to create the cert with the internal address, and loopback and a dns entry for `localhost`. If you have an addition external IP you would add to the ip list as well. We also specify the `hostname` for the DNS section. We are also going to extract / create the ca for later use, you will need it. We are going to create them and then put them in a certs directory in the elasticsearch config directory. 
+We will be setting up TLS on the node for both the [Transport Layer](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-basic-setup.html) and [HTTPS](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-basic-setup-https.html). We will creating non-trusted / self-signed certs using the `elasticsearch-certutil` tool docs [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html). First we will create a CA (certificate authority) and then use that to generate the certificates. 
 
 Just take the defaults for all the question and skip the passwords for the .p12s, you can try that later if you like. 
-
-
 
 ``` bash
 sudo -i
@@ -69,7 +64,8 @@ cd /usr/share/elasticsearch
 ./bin/elasticsearch-certutil ca
 ./bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12
 ```
-Now we are going to create the http certs 
+Now we are going to generate the https certs this just shows the pertinent lines...
+Note you will want to create the cert with the internal address, and loopback and a dns entry for `localhost`. If you have an addition external IP you would add to the ip list as well. We also specify the `hostname` for the DNS section. 
 
 ```
 ./bin/elasticsearch-certutil http
@@ -97,7 +93,7 @@ Enter all the IP addresses that you need, one per line.
 When you are done, press <ENTER> once more to move on to the next step.
 
 10.168.0.116
-127.0.0.1#
+127.0.0.1
 ...
 Is this correct [Y/n]y
 ...
