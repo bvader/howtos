@@ -3,9 +3,7 @@
 
 #### NOTE / DISCLAIMER: **This configuration should only be used for Dev / POC purposes this is NOT suitable for production use.**
 
-For Further Details Please Refer to the Official Documentation:
-[Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
-[Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
+For Further Details Please Refer to the Official Documentation: [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) and [Kibana](https://www.elastic.co/guide/en/kibana/current/index.html)
 
 ### What we are doing?
 
