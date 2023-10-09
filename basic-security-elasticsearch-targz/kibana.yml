@@ -1,0 +1,29 @@
+### Step 1 - No Security
+server.host: "0.0.0.0"
+
+# NOTE: The is correct for Step1, BUT Comment Out in Step 4!
+# you can use localhost or the hostname that was returned in Step 0 hostname command
+elasticsearch.hosts: ["http://localhost:9200"]
+
+### Step 2
+# elasticsearch.username: "kibana_system"
+# elasticsearch.password: "aksdfjhasldkfjhasdflkj"
+
+### Step 3 No Update
+
+### Step 4
+### HTTPS Comment Out Step 1 hosts!!!
+# You can use localhost or the hostname that was returned in Step 0 hostname command
+# elasticsearch.hosts: ["https://localhost:9200"]
+# elasticsearch.ssl.certificateAuthorities: config/elasticsearch-ca.pem
+
+### Step 0
+# LOGGING Step 0
+logging.root.level: debug
+logging.loggers:
+    - name: elasticsearch-service
+      appenders: [console]
+      level: debug
+
+# Saved Object Encryption
+xpack.encryptedSavedObjects.encryptionKey: "yourreallylongencryptionkeyyadayadavyadayadayadayadayadayada"
