@@ -6,8 +6,6 @@
 network.host: 0.0.0.0
 discovery.type: single-node
 
-
-
 ### Step 2
 # xpack.security.enabled: true
 
