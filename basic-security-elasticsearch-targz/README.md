@@ -71,7 +71,7 @@ Run these 3 commands and save the results for later use
 `hostname -f` If you want to use a FQDN
 
 #### NOTE Hostnames
-All hostnames are examples my hostname  of `stephenb-es-test` is just the example please use `localhost` or the hostname retruned by one of the commands above in all subsequent commands
+All hostnames are examples my hostname  of `stephenb-es-test` is just the example please use `localhost` or the hostname retruned by one of the commands above in all subsequent commands and in the `kibana.yml` where needed.
 
 #### IMPORTANT
 **For 7.x You do not need to make any changes in the `elasticsearch.yml` or `kibana.yml` files**
