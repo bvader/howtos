@@ -70,12 +70,17 @@ Run these 3 commands and save the results for later use
 `hostname`
 `hostname -f` If you want to use a FQDN
 
+#### IMPORTANT
+**For 7.x You do not need to make any changes in the `elasticsearch.yml` or `kibana.yml` files**
+
+**For 8.x You do need to ucomment the Step 0 line in `elasticsearch.yml` to disable autoconfiguration, there are no changes in `kibana.yml`**
+
 ### NOTE Hostnames
 All hostnames are examples my hostname  of `stephenb-es-test` is just the example please use `localhost` or the hostname retruned by one of the commands above in all subsequent commands
 
 ## Step 1 - Basic Non Secure Stack
 
-You do not need to make any changes in the `elasticsearch.yml` or `kibana.yml` files
+
 
 T1 - Start Elastic 
 
