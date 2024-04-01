@@ -2,7 +2,9 @@
 
 The begining of a place to file all those things that are scatterd. 
 
-* [Single Node Elasticsearch + Kibana + Auth + SSL](./basic-security-elasticsearch/README.md)
+* [Single Node Elasticsearch + Kibana + Auth + SSL using pkg](./basic-security-elasticsearch-pkg/README.md)
+
+* [Single Node Elasticsearch + Kibana + Auth + SSL using tar.gz](./basic-security-elasticsearch-targz/README.md)
 
 * [Product Catalog Search ](./catalog-search/README.md)
 
