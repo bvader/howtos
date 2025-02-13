@@ -1,6 +1,6 @@
 ### How Tos, Samples and Examples
 
-The begining of a place to file all those things that are scatterd. 
+The beginning of a place to file all those things that are scatterd. 
 
 * [Single Node Elasticsearch + Kibana + Auth + SSL using pkg](./basic-security-elasticsearch-pkg/README.md)
 
